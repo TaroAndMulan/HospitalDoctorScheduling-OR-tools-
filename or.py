@@ -10,15 +10,19 @@ def main():
     date_start = "Friday"
     date_start_int = 4
 
+    doctor_name = ["กร","กรรณ","กาย","ทาโร่","มู่หลาน","ซิมบ่า","นาร่า","เสือ","---"]
+
     def dt(x):
         return date_type[(date_start_int+x)%7]
 
     num_doctor = 8
     num_shifts = 2
-    num_days = 30
+    num_days = 31
     all_doctor = range(num_doctor)
     all_shifts = range(num_shifts)
     all_days = range(num_days)
+
+    #REAL DATE / no OFFSET
     all_exception = [
         [4,11,15,16,17,18],
         [15,16,17],
@@ -28,6 +32,11 @@ def main():
         [],
         [],
         [],
+    ]
+    #REAL DATE/ no OFFSET
+    all_outside = [
+        [14,1],
+        [5,0]
     ]
 
     # Creates the model.
@@ -44,7 +53,12 @@ def main():
     # Each shift is assigned to exactly one doctor in .
     for d in all_days:
         for s in all_shifts:
-            model.AddExactlyOne(shifts[(n, d, s)] for n in all_doctor)
+            blocked=False
+            for o in all_outside:
+                if(o[0]-1==d and o[1]==s):
+                    blocked=True
+            if(not blocked):
+                model.AddExactlyOne(shifts[(n, d, s)] for n in all_doctor)
 
     # Each doctor works at most one shift per day.
     for n in all_doctor:
@@ -77,14 +91,17 @@ def main():
                 model.AddAtMostOne(shifts[(n, x, s)] for s in all_shifts for x in range(d-1,d+1))       
 
  
-    #EXCEPTION
+    #EXCEPTION FROM DOCTOR
     #d-1 because day in exception start with 1 not 0 (OFFSET)
     for n in all_doctor:
         for d in all_exception[n]:
             model.Add(shifts[(n,d-1,0)]==0)
             model.Add(shifts[(n,d-1,1)]==0)
-    
 
+    #EXCEPTION FROM OUTSIDE DOCTOR
+    for o in all_outside:
+       for n in all_doctor:
+            model.Add(shifts[(n,o[0]-1,o[1])]==0)
 
     # Try to distribute the shifts evenly, so that each doctor works
     # min_shifts_per_doctor shifts. If this is not possible, because the total
@@ -138,7 +155,7 @@ def main():
     status = solver.Solve(model)
 
     # stat table
-    table = [[0 for i in range(num_shifts)] for j in range(num_days)]
+    table = [[-1 for i in range(num_shifts)] for j in range(num_days)]
     weekendTable = [0 for i in range(num_doctor)]
     exceptionTable = [0 for i in range(num_doctor)]
 
@@ -164,9 +181,9 @@ def main():
     #print solved scedules
     for dd,tt in enumerate(table):
         if (dt(dd)!="Saturday" and dt(dd)!="Sunday"):
-            print(f'{f"day{dd+1} ({dt(dd)})":20} {tt[0]} {tt[1]}')
+            print(f'{f"day{dd+1} ({dt(dd)})":20} {doctor_name[tt[0]]} {doctor_name[tt[1]]}')
         if (dt(dd)=="Saturday" or dt(dd)=="Sunday"):
-            cprint(f'{f"day{dd+1} ({dt(dd)})":20} {tt[0]} {tt[1]}',"green")
+            cprint(f'{f"day{dd+1} ({dt(dd)})":20} {doctor_name[tt[0]]} {doctor_name[tt[1]]}',"green")
         cprint("-------------------------","red")
 
     grade  = [[0,0,0,0] for i in range(num_doctor)]
@@ -174,20 +191,27 @@ def main():
     #calculate ER and Ward normal
     for dd,tt in enumerate(table):
         if(dt(dd)=="Saturday" or dt(dd)=="Sunday"):
-            grade[tt[0]][2]+=1
-            grade[tt[1]][3]+=1
+            if(tt[0]!=-1):
+                grade[tt[0]][2]+=1
+            if(tt[1]!=-1):
+                grade[tt[1]][3]+=1
         else:
-            grade[tt[0]][0]+=1
-            grade[tt[1]][1]+=1     
+            if(tt[0]!=-1):
+                grade[tt[0]][0]+=1
+            if(tt[1]!=-1):
+                grade[tt[1]][1]+=1     
 
     # PRINT STATISTIC       
     for i in range(num_doctor):
-        print(f"doctor {i}: NORMAL -> ER:{grade[i][0]} WARD:{grade[i][1]}  TOTAL:{grade[i][0]+grade[i][1]}")
-        print(f"          WEEKEND-> ER:{grade[i][2]} WARD:{grade[i][3]}  TOTAL:{grade[i][2]+grade[i][3]} ")
+        print(f"doctor {i}: (NORMAL)  ER:{grade[i][0]} WARD:{grade[i][1]}  TOTAL:{grade[i][0]+grade[i][1]}")
+        print(f"          (WEEKEND) ER:{grade[i][2]} WARD:{grade[i][3]}  TOTAL:{grade[i][2]+grade[i][3]} ")
         print(f"          TOTAL: {sum(grade[i])}")
         cprint("-------------------------","red")
 
     #EXCEPTION_FAIL:{exceptionTable[i]}
+        
+    #OUTPUT DATA
+
 
 if __name__ == "__main__":
     main()
