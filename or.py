@@ -160,14 +160,14 @@ def main():
         print("No optimal solution found !")
 
     #PRINT RESULT (MANUAL)
-    cprint("---------","red")
+    cprint("-------------------------","red")
     #print solved scedules
     for dd,tt in enumerate(table):
         if (dt(dd)!="Saturday" and dt(dd)!="Sunday"):
-            print(f"day {dd+1} ({dt(dd)}): {tt[0]} {tt[1]}")
+            print(f'{f"day{dd+1} ({dt(dd)})":20} {tt[0]} {tt[1]}')
         if (dt(dd)=="Saturday" or dt(dd)=="Sunday"):
-            cprint(f"day {dd+1} ({dt(dd)}): {tt[0]} {tt[1]}","green")
-        cprint("---------","red")
+            cprint(f'{f"day{dd+1} ({dt(dd)})":20} {tt[0]} {tt[1]}',"green")
+        cprint("-------------------------","red")
 
     grade  = [[0,0,0,0] for i in range(num_doctor)]
 
@@ -185,7 +185,7 @@ def main():
         print(f"doctor {i}: NORMAL -> ER:{grade[i][0]} WARD:{grade[i][1]}  TOTAL:{grade[i][0]+grade[i][1]}")
         print(f"          WEEKEND-> ER:{grade[i][2]} WARD:{grade[i][3]}  TOTAL:{grade[i][2]+grade[i][3]} ")
         print(f"          TOTAL: {sum(grade[i])}")
-        cprint("---------","red")
+        cprint("-------------------------","red")
 
     #EXCEPTION_FAIL:{exceptionTable[i]}
 
