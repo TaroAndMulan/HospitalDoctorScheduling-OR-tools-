@@ -17,17 +17,17 @@ def main():
 
     num_doctor = 8
     num_shifts = 2
-    num_days = 30
+    num_days = 31
     all_doctor = range(num_doctor)
     all_shifts = range(num_shifts)
     all_days = range(num_days)
 
     #REAL DATE / no OFFSET
     all_exception = [
-        [4,11],
-        [],
-        [],
-        [],
+        [4,11,15,16,17,18],
+        [15,16,17],
+        [23,24,26],
+        [23,24],
         [],
         [],
         [],
@@ -35,7 +35,8 @@ def main():
     ]
     #REAL DATE/ no OFFSET
     all_outside = [
-   
+        [14,1],
+        [5,0]
     ]
 
     # Creates the model.
@@ -149,18 +150,37 @@ def main():
         )
     ) """
 
+
     # Creates the solver and solve.
     solver = cp_model.CpSolver()
-    status = solver.Solve(model)
+    solver.parameters.linearization_level = 0
+    # Enumerate all solutions.
+    solver.parameters.enumerate_all_solutions = True
 
-    # stat table
-    table = [[-1 for i in range(num_shifts)] for j in range(num_days)]
-    weekendTable = [0 for i in range(num_doctor)]
-    exceptionTable = [0 for i in range(num_doctor)]
+    class NursesPartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
+        """Print intermediate solutions."""
 
-    if status == cp_model.OPTIMAL:
-        for d in all_days:
-            for n in all_doctor:
+        def __init__(self, shifts, num_doctor, num_days, num_shifts, limit):
+            cp_model.CpSolverSolutionCallback.__init__(self)
+            self._shifts = shifts
+            self._num_doctor = num_doctor
+            self._num_days = num_days
+            self._num_shifts = num_shifts
+            self._solution_count = 0
+            self._solution_limit = limit
+
+        def on_solution_callback(self):
+            self._solution_count += 1
+            print(f"Solution {self._solution_count}")
+
+             # stat table
+            table = [[-1 for i in range(num_shifts)] for j in range(num_days)]
+            weekendTable = [0 for i in range(num_doctor)]
+            exceptionTable = [0 for i in range(num_doctor)]
+
+            if status == cp_model.OPTIMAL:
+                for d in all_days:
+             for n in all_doctor:
                 for s in all_shifts:
                     if solver.Value(shifts[(n, d, s)]) == 1:
                         #fill stat table
@@ -206,6 +226,26 @@ def main():
         print(f"          (WEEKEND) ER:{grade[i][2]} WARD:{grade[i][3]}  TOTAL:{grade[i][2]+grade[i][3]} ")
         print(f"          TOTAL: {sum(grade[i])}")
         cprint("-------------------------","red")
+
+
+            if self._solution_count >= self._solution_limit:
+                print(f"Stop search after {self._solution_limit} solutions")
+                self.StopSearch()
+
+        def solution_count(self):
+            return self._solution_count
+
+    # Display the first five solutions.
+    solution_limit = 5
+    solution_printer = NursesPartialSolutionPrinter(
+        shifts, num_doctor, num_days, num_shifts, solution_limit
+    )
+
+    solver.Solve(model, solution_printer)
+
+
+
+   
 
     #EXCEPTION_FAIL:{exceptionTable[i]}
         
