@@ -17,7 +17,7 @@ def main():
 
     num_doctor = 8
     num_shifts = 2
-    num_days = 31
+    num_days = 50
     all_doctors = range(1,num_doctor+1)
     all_shifts = range(num_shifts)
     all_days = range(1,num_days+1)
@@ -39,7 +39,7 @@ def main():
     ]
 
     all_holidays = [
-        11
+        11,14
     ]
    
    # calculate weekend+sat+sun
@@ -128,15 +128,15 @@ def main():
         model.Add(min_shifts_per_doctor <= num_shifts_worked)
         model.Add(num_shifts_worked <= max_shifts_per_doctor)
 
-   # equal number of weekend (<2 per person)  I check how many sunday
+   # equal number of weekend+holiday works
     for n in all_doctors:
         num_weekend = 0
         for d in all_days:
-            if(dayTodate(d)=="Sunday" or dayTodate=="Saturday" or d in all_holidays):
+            if(dayTodate(d)=="Sunday" or dayTodate(d)=="Saturday" or d in all_holidays):
                 for s in all_shifts:
                     num_weekend += shifts[(n, d, s)]
-        model.Add(num_weekend <= (num_holidayplusweekend // num_doctor)+1)
-        model.Add(num_weekend>= (num_holidayplusweekend // num_doctor))
+        model.Add(num_weekend <= (num_holidayplusweekend // num_doctor)+3)
+        model.Add(num_weekend>= (num_holidayplusweekend // num_doctor)-3)
 
     # sum left = sum rigth
     for n in all_doctors:
