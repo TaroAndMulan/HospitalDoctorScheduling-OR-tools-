@@ -22,14 +22,31 @@ def main():
     all_shifts = range(num_shifts)
     all_days = range(1,num_days+1)
 
-    #REAL DATE / no OFFSET
-    all_exception = {1:[4,11],2:[],3:[],4:[],5:[],6:[],7:[],8:[]}
+    # EXCEPTION INSIDE DOCTOR
+    all_exception = {
+        1:[9,11],
+        2:[],
+        3:[],
+        4:[],
+        5:[],
+        6:[],
+        7:[],
+        8:[]}
 
-    #REAL DATE/ no OFFSET
+    #EXCEPTION OUTSIDE DOCTOR
     all_outside = [
         [6,1]
     ]
+
+    all_holidays = [
+        11
+    ]
    
+   # calculate weekend+sat+sun
+    num_holidayplusweekend = len(all_holidays)
+    for d in all_days:
+        if dayTodate(d)=="Saturday" or dayTodate(d)=="Sunday":
+            num_holidayplusweekend+=1
 
     # Creates the model.
     model = cp_model.CpModel()
@@ -98,8 +115,8 @@ def main():
 
     # Try to distribute the shifts evenly
             
-    min_shifts_per_doctor = (num_shifts * num_days) // num_doctor
-    if num_shifts * num_days % num_doctor == 0:
+    min_shifts_per_doctor = ((num_shifts * num_days)-len(all_outside)) // num_doctor
+    if ((num_shifts * num_days)-len(all_outside)) % num_doctor == 0:
         max_shifts_per_doctor = min_shifts_per_doctor
     else:
         max_shifts_per_doctor = min_shifts_per_doctor + 1
@@ -115,11 +132,11 @@ def main():
     for n in all_doctors:
         num_weekend = 0
         for d in all_days:
-            if(dayTodate(d)=="Sunday"):
+            if(dayTodate(d)=="Sunday" or dayTodate=="Saturday" or d in all_holidays):
                 for s in all_shifts:
                     num_weekend += shifts[(n, d, s)]
-        model.Add(num_weekend <= 2)
-        model.Add(num_weekend>0)
+        model.Add(num_weekend <= (num_holidayplusweekend // num_doctor)+1)
+        model.Add(num_weekend>= (num_holidayplusweekend // num_doctor))
 
     # sum left = sum rigth
     for n in all_doctors:
@@ -171,9 +188,9 @@ def main():
     cprint("-------------------------","red")
     #print solved scedules
     for d in schedule:
-        if (dayTodate(d)!="Saturday" and dayTodate(d)!="Sunday"):
+        if (dayTodate(d)!="Saturday" and dayTodate(d)!="Sunday" and d not in all_holidays):
             print(f'{f"day{d} ({dayTodate(d)})":20} {doctor_name[schedule[d][0]]} {doctor_name[schedule[d][1]]}')
-        if (dayTodate(d)=="Saturday" or dayTodate(d)=="Sunday"):
+        if (dayTodate(d)=="Saturday" or dayTodate(d)=="Sunday" or d in all_holidays):
             cprint(f'{f"day{d} ({dayTodate(d)})":20} {doctor_name[schedule[d][0]]} {doctor_name[schedule[d][1]]}',"green")
         cprint("-------------------------","red")
 
@@ -181,7 +198,7 @@ def main():
 
     #calculate ER and Ward normal
     for d in schedule:
-        if(dayTodate(d)=="Saturday" or dayTodate(d)=="Sunday"):
+        if(dayTodate(d)=="Saturday" or dayTodate(d)=="Sunday" or d in all_holidays):
             if(schedule[d][0]!=-1):
                 stat_table[schedule[d][0]][2]+=1
             if(schedule[d][1]!=-1):
