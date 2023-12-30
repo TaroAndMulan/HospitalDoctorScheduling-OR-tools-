@@ -8,23 +8,23 @@ def main():
     #INIT variable
     date_type = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     date_start = "Friday"
-    date_start_int = 4
+    date_start_int = 1
 
-    doctor_name = {1:"กร",2:"กรรณ",3:"กาย",4:"ทาโร่",5:"มู่หลาน",6:"ซิมบ่า",7:"นาร่า",8:"เสือ",-1:"---"}
+    doctor_name = {1:"เจน",2:"นาวา",3:"จี้",4:"อู๋",5:"เกมส์",6:"เมฆ",7:"นาร่า",8:"เสือ",-1:"---"}
 
     def dayTodate(x):
         return date_type[(date_start_int+x-1)%7]
 
-    num_doctor = 8
+    num_doctor = 6
     num_shifts = 2
-    num_days = 50
+    num_days = 31
     all_doctors = range(1,num_doctor+1)
     all_shifts = range(num_shifts)
     all_days = range(1,num_days+1)
 
     # EXCEPTION INSIDE DOCTOR
     all_exception = {
-        1:[9,11],
+        1:[],
         2:[],
         3:[],
         4:[],
@@ -35,7 +35,6 @@ def main():
 
     #EXCEPTION OUTSIDE DOCTOR
     all_outside = [
-        [6,1]
     ]
 
     all_holidays = [
