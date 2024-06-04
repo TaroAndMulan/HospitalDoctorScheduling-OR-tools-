@@ -33,12 +33,12 @@ Most requirement can be turn into contraints like the above examples except the 
 
 >  Optimal Schedule
 
-* ![pic2](img/exampleOutput.png)
+ ![pic2](img/exampleOutput.png)
 
 
 > Summary 
 
-* ![pic2](img/exampleOutput2.png)
+ ![pic2](img/exampleOutput2.png)
 
 
 ## Usage
