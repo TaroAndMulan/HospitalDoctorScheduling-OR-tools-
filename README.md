@@ -31,7 +31,7 @@ Most requirement can be turn into contraints like the above examples except the 
 
 ## Example output
 
->  schedule
+>  Optimal Schedule
 
 * ![pic2](img/exampleOutput.png)
 
