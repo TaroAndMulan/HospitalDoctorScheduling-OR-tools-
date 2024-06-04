@@ -43,5 +43,7 @@ Most requirement can be turn into contraints like the above examples except the 
 
 ## Usage
 Requirement (Python 3.10, ORTOOLS)
+
 Excel integration is not included in this repo, you can still run this project manually by editing the first few line in or_all.py to change doctors name, absent list, and etc.
+
 > python or_all.py
