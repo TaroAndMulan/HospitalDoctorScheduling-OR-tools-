@@ -18,12 +18,12 @@ Hospital requirements and doctor availability are translated into mathematics eq
 >   Here is an example of a constraint saying that doctors are not allow to work both shift on a single day
 
 
-* ![pic3](img/basicexample.png)
+ ![pic3](img/basicexample.png)
 
 
 >  Another example, a constraint saything that each doctor should have approximately the same monthly workload
 
-* ![pic2](img/example1.png)
+ ![pic2](img/example1.png)
 
 
 Most requirement can be turn into contraints like the above examples except the constraint that are not linear. The hard part of this project is thinking about how each hospital requirement can be turn into linear equation.
