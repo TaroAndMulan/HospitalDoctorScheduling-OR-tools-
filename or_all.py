@@ -6,24 +6,44 @@ from termcolor import colored, cprint
 def main():
 
     #INIT variable
-    date_type = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-    date_start = "Monday"
-    date_start_int = 0
 
-    doctor_name = {1:"เจน",2:"นาวา",3:"จี้",4:"อู๋",5:"เกมส์",6:"เมก",7:"นาร่า",8:"เสือ",-1:"---"}
+
+    
+    date_type = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+
+    #EDIT 
+    # First day of the month (For example 0 = Monday according to the list above)
+    date_start_int = 0
 
     def dayTodate(x):
         return date_type[(date_start_int+x-1)%7]
 
+    #EDIT
+    #DOCTOR NAME
+    doctor_name = {1:"เจน",2:"นาวา",3:"จี้",4:"อู๋",5:"เกมส์",6:"เมก",7:"นาร่า",8:"เสือ",-1:"---"}
+
+    # EDIT
+    # NUMBER OF DOCTORS
     num_doctor = 8
+
+    #EDIT
+    # NUMBER OF SHIFT PER DAY
     num_shifts = 2
+
+    #EDIT
+    # NUMBER OF DAY THIS MONTH
     num_days = 31
+
     all_doctors = range(1,num_doctor+1)
     all_shifts = range(num_shifts)
     all_days = range(1,num_days+1)
+
+    # Hyperparameter, 
     max_week_offset = 2
     min_week_offset = 0    #negative
-    # EXCEPTION INSIDE DOCTOR
+
+    # EDIT 
+    # Doctor Absent information (For example, doctor #1 can not work on day 19,20,21)
     all_exception = {
         1:[19,20,21],
         2:[],
@@ -34,7 +54,9 @@ def main():
         7:[],
         8:[]}
 
-    #EXCEPTION OUTSIDE DOCTOR
+    # EDIT
+    # EXCEPTION FOR visiting DOCTOR (for example, visitingDoctor #1 from another hospital will work on day 2 shift 1, visitingDoctor #3 will work on day 30 shift 0 )
+    # The visiting doctor will be mark as "---" in the output
     all_outside = [
         [2,1],
         [10,1],
@@ -42,6 +64,8 @@ def main():
         [31,0]
     ]
 
+    # EDIT
+    # extra holidays that is not SAT or SUN (FOR EXAMPLE, DAY #1 is a holiday that is not sunday or saturday)
     all_holidays = [
         1
     ]
@@ -176,6 +200,7 @@ def main():
     solver.parameters.enumerate_all_solutions = True
 
     solution = {i:{} for i in range(0,100)}
+
     class doctorsPartialSolutionPrinter(cp_model.CpSolverSolutionCallback):
         """Print intermediate solutions."""
 
@@ -271,10 +296,8 @@ def main():
                           
 
             # PRINT STATISTIC
-            
-                 
             for n in all_doctors:
-                print(f" {doctor_name[n]}: (NORMAL)  ER:{stat_table[n][0]} WARD:{stat_table[n][1]}  TOTAL:{stat_table[n][0]+stat_table[n][1]}")
+                print(f" {doctor_name[n]}:(NORMAL)  ER:{stat_table[n][0]} WARD:{stat_table[n][1]}  TOTAL:{stat_table[n][0]+stat_table[n][1]}")
                 print(f"          (WEEKEND) ER:{stat_table[n][2]} WARD:{stat_table[n][3]}  TOTAL:{stat_table[n][2]+stat_table[n][3]} ")
                 print(f"          TOTAL: {sum(stat_table[n])}")
                 print(f"avg_day_interval: {avg_per_doc[n]}")
@@ -370,11 +393,11 @@ def main():
         
                 
         for n in all_doctors:
-            print(f" {doctor_name[n]}: (NORMAL)  ER:{stat_table[n][0]} WARD:{stat_table[n][1]}  TOTAL:{stat_table[n][0]+stat_table[n][1]}")
+            print(f" {doctor_name[n]}:     (NORMAL)  ER:{stat_table[n][0]} WARD:{stat_table[n][1]}  TOTAL:{stat_table[n][0]+stat_table[n][1]}")
             print(f"          (WEEKEND) ER:{stat_table[n][2]} WARD:{stat_table[n][3]}  TOTAL:{stat_table[n][2]+stat_table[n][3]} ")
             print(f"          TOTAL: {sum(stat_table[n])}")
-            print(f"avg_day_interval: {avg_per_doc[n]}")
-            cprint("-------------------------","red")     
+            print(f"          Avg_days_between_shift: {round(avg_per_doc[n],2)}")
+            cprint("-----------------------------------","red")     
     
     print_select_solution(solution[solution["max"]])
 # BEST SOLUTION !!!!!!!!!!# BEST SOLUTION !!!!!!!!!!# BEST SOLUTION !!!!!!!!!!
