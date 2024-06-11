@@ -1,4 +1,4 @@
-# Thayang hospital Doctor Scheduler
+# Hospital Doctor Scheduler
 
 ![pic1](img/realtable.png)
 
